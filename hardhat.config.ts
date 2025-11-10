@@ -1,14 +1,14 @@
-import hardhatToolboxMochaEthersPlugin from "@nomicfoundation/hardhat-toolbox-mocha-ethers";
-import { configVariable, defineConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@openzeppelin/hardhat-upgrades";
+import { defineConfig } from "hardhat/config";
+
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY ?? "";
+const MNEMONIC = process.env.MNEMONIC ?? "";
 
 export default defineConfig({
-  plugins: [hardhatToolboxMochaEthersPlugin],
   solidity: {
-    profiles: {
-      default: {
-        version: "0.8.28",
-      },
-      production: {
+    compilers: [
+      {
         version: "0.8.28",
         settings: {
           optimizer: {
@@ -17,22 +17,14 @@ export default defineConfig({
           },
         },
       },
-    },
+    ],
   },
   networks: {
-    hardhatMainnet: {
-      type: "edr-simulated",
-      chainType: "l1",
-    },
-    hardhatOp: {
-      type: "edr-simulated",
-      chainType: "op",
-    },
     sepolia: {
-      type: "http",
-      chainType: "l1",
-      url: configVariable("SEPOLIA_RPC_URL"),
-      accounts: [configVariable("SEPOLIA_PRIVATE_KEY")],
+      url: ALCHEMY_API_KEY
+        ? `https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
+        : undefined,
+      accounts: MNEMONIC ? { mnemonic: MNEMONIC } : undefined,
     },
   },
 });
